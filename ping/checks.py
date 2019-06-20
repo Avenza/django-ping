@@ -20,17 +20,20 @@ def checks(request):
     for path in getattr(settings, 'PING_CHECKS', PING_DEFAULT_CHECKS):
             i = path.rfind('.')
             module, attr = path[:i], path[i+1:]
-            try:
-                mod = import_module(module)
-            except ImportError as e:
-                raise ImproperlyConfigured('Error importing module %s: "%s"' % (module, e))
-            try:
-                func = getattr(mod, attr)
-            except AttributeError:
-                raise ImproperlyConfigured('Module "%s" does not define a "%s" callable' % (module, attr))
+            
+            # Check request to determine whether to perform this check
+            if request.GET.get(attr) == 'true':
+                try:
+                    mod = import_module(module)
+                except ImportError as e:
+                    raise ImproperlyConfigured('Error importing module %s: "%s"' % (module, e))
+                try:
+                    func = getattr(mod, attr)
+                except AttributeError:
+                    raise ImproperlyConfigured('Module "%s" does not define a "%s" callable' % (module, attr))
 
-            key, value = func(request)
-            response_dict[key] = value
+                key, value = func(request)
+                response_dict[key] = value
 
     return response_dict
 
