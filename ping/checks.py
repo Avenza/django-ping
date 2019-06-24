@@ -21,8 +21,9 @@ def checks(request):
             i = path.rfind('.')
             module, attr = path[:i], path[i+1:]
             
-            # Check request to determine whether to perform this check
-            if request.GET.get(attr) == 'true':
+            # Check request to determine whether to perform this check. If length is equal to 2,
+            # then no extra parameters were specified, so display all statuses.
+            if len(request.GET) == 2 or request.GET.get(attr) == 'true':
                 try:
                     mod = import_module(module)
                 except ImportError as e:
