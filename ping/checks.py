@@ -22,7 +22,7 @@ def checks(request):
             i = path.rfind('.')
             module, attr = path[:i], path[i+1:]
             
-            # Check request to determine whether to perform this check. If length is equal to 2,
+            # Check request to determine whether to perform this check. If extra_parameters is empty,
             # then no extra parameters were specified, so display all statuses.
             if not extra_parameters or attr in extra_parameters:
                 try:
