@@ -14,6 +14,7 @@ def checks(request):
     """
     # We want to preserve the order
     response_dict = OrderedDict()
+    extra_parameters = request.GET.get('parameters')
 
     #Taken straight from Django
     #If there is a better way, I don't know it
@@ -23,7 +24,7 @@ def checks(request):
             
             # Check request to determine whether to perform this check. If length is equal to 2,
             # then no extra parameters were specified, so display all statuses.
-            if len(request.GET) == 2 or request.GET.get(attr) == 'true':
+            if not extra_parameters or attr in extra_parameters:
                 try:
                     mod = import_module(module)
                 except ImportError as e:
