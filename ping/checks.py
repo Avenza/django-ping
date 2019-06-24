@@ -14,23 +14,28 @@ def checks(request):
     """
     # We want to preserve the order
     response_dict = OrderedDict()
+    extra_parameters = request.GET.get('parameters')
 
     #Taken straight from Django
     #If there is a better way, I don't know it
     for path in getattr(settings, 'PING_CHECKS', PING_DEFAULT_CHECKS):
             i = path.rfind('.')
             module, attr = path[:i], path[i+1:]
-            try:
-                mod = import_module(module)
-            except ImportError as e:
-                raise ImproperlyConfigured('Error importing module %s: "%s"' % (module, e))
-            try:
-                func = getattr(mod, attr)
-            except AttributeError:
-                raise ImproperlyConfigured('Module "%s" does not define a "%s" callable' % (module, attr))
+            
+            # Check request to determine whether to perform this check. If length is equal to 2,
+            # then no extra parameters were specified, so display all statuses.
+            if not extra_parameters or attr in extra_parameters:
+                try:
+                    mod = import_module(module)
+                except ImportError as e:
+                    raise ImproperlyConfigured('Error importing module %s: "%s"' % (module, e))
+                try:
+                    func = getattr(mod, attr)
+                except AttributeError:
+                    raise ImproperlyConfigured('Module "%s" does not define a "%s" callable' % (module, attr))
 
-            key, value = func(request)
-            response_dict[key] = value
+                key, value = func(request)
+                response_dict[key] = value
 
     return response_dict
 
