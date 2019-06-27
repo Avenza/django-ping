@@ -14,6 +14,7 @@ def checks(request):
     """
     # We want to preserve the order
     response_dict = OrderedDict()
+    extra_parameters = request.GET.get('parameters')
 
     #Taken straight from Django
     #If there is a better way, I don't know it
@@ -21,8 +22,9 @@ def checks(request):
             i = path.rfind('.')
             module, attr = path[:i], path[i+1:]
             
-            # Check request to determine whether to perform this check
-            if request.GET.get(attr) == 'true':
+            # Check request to determine whether to perform this check. If extra_parameters is empty,
+            # then no extra parameters were specified, so display all statuses.
+            if not extra_parameters or attr in extra_parameters:
                 try:
                     mod = import_module(module)
                 except ImportError as e:
