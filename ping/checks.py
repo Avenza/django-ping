@@ -15,6 +15,8 @@ def checks(request):
     # We want to preserve the order
     response_dict = OrderedDict()
     extra_parameters = request.GET.get('parameters')
+    if extra_parameters:
+        extra_parameters = extra_parameters.split(',')
 
     #Taken straight from Django
     #If there is a better way, I don't know it
